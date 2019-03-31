@@ -29,6 +29,24 @@ gEase.string_alignment = function( base_value, digit, pad_value ){
   }
 };
 
+gEase.html_encode = function( value ){
+  return value.replace( /&/, "&amp;" )
+    .replace( /'/, "&#x27;" )
+    .replace( /`/, "&#x60;" )
+    .replace( /"/, '&quot;' )
+    .replace( /</, "&lt;" )
+    .replace( />/, "&gt;" );
+};
+
+gEase.html_decode = function( value ){
+  return value.replace( /&amp;/, "&" )
+    .replace( /&#x27;/, "'" )
+    .replace( /&#x60;/, "`" )
+    .replace( /&quot;/, '"' )
+    .replace( /&lt;/, "<" )
+    .replace( /&gt;/, ">" );
+};
+
 gEase.each = function( values, callback, data ){
   if ( values instanceof Object ){
     if ( values instanceof Array ){

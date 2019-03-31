@@ -23,4 +23,11 @@ function gEaseTest(){
   sheet.AddRecord( [ "A", "B", "C" ], 2 );
   sheet.SetWidths( [ 200 ] );
   sheet.SetFilterAll();
+  
+  Log.D( gEase.html_encode( "&" ) +" : "+ gEase.html_decode( "&amp;" ) );
+  Log.D( gEase.html_encode( "'" ) +" : "+ gEase.html_decode( "&#x27;" ) );
+  Log.D( gEase.html_encode( "`" ) +" : "+ gEase.html_decode( "&#x60;" ) );
+  Log.D( gEase.html_encode( "\"" ) +" : "+ gEase.html_decode( "&quot;" ) );
+  Log.D( gEase.html_encode( "<" ) +" : "+ gEase.html_decode( "&lt;" ) );
+  Log.D( gEase.html_encode( ">" ) +" : "+ gEase.html_decode( "&gt;" ) );
 }
