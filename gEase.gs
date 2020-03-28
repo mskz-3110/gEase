@@ -48,16 +48,14 @@ gEase.html_decode = function( value ){
 };
 
 gEase.each = function( values, callback, data ){
-  if ( values instanceof Object ){
-    if ( values instanceof Array ){
-      var values_size = values.length;
-      for ( var i = 0; i < values_size; ++i ){
-        if ( false === callback( values[ i ], data ) ) break;
-      }
-    }else{
-      for ( var key in values ){
-        if ( false === callback( values[ key ], data ) ) break;
-      }
+  if ( Array.isArray( values ) ){
+    var values_size = values.length;
+    for ( var i = 0; i < values_size; ++i ){
+      if ( false === callback( values[ i ], data ) ) break;
+    }
+  }else{
+    for ( var key in values ){
+      if ( false === callback( values[ key ], data ) ) break;
     }
   }
 };
