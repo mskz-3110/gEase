@@ -4,24 +4,25 @@ function gEaseTest(){
   Log.I( "inf" );
   Log.W( "wrn" );
   Log.E( "err" );
+  Log.D( null );
   
   Log.D( gEase.json_from_string( "", {} ) );
   Log.D( gEase.json_to_string( gEase.json_from_string( "[{ \"KEY\" : \"VALUE\" }]" ) ) );
   
-  ( new gEase.Regex( /([0-9])[a-z]/g ) ).Match( "1a2b", function( array ){
+  ( new gEase.Regex( /([0-9])[a-z]/g ) ).Match( "1a2b", array => {
     Log.D( gEase.json_to_string( array ) );
   });
-  ( new gEase.Regex( new RegExp( "([0-9])[a-z]", "g" ) ) ).Match( "3c4d", function( array ){
+  ( new gEase.Regex( new RegExp( "([0-9])[a-z]", "g" ) ) ).Match( "3c4d", array => {
     Log.D( gEase.json_to_string( array ) );
   });
   
   Log.D( "date_time="+ ( new gEase.DateTime() ).ToString() );
   
-  var sheet = new gEase.Sheet( Log.GetSheet() );
-  var range = sheet.AddRecord( [ 1, 2, 3 ] );
-  sheet.SetHeights( [ 30, 60 ], range.getRow() );
-  sheet.AddRecord( [ "A", "B", "C" ], 2 );
-  sheet.SetWidths( [ 200 ] );
+  var sheet = new gEase.Sheet( gEase.sheet_get( "log" ) );
+  var range = sheet.AddRecord( 1, [ 1, 2, 3 ] );
+  sheet.SetHeights( range.getRow(), [ 30, 60 ] );
+  sheet.AddRecord( 2, [ "A", "B", "C" ] );
+  sheet.SetWidths( 1, [ 200 ] );
   sheet.SetFilterAll();
   
   Log.D( gEase.html_encode( "&" ) +" : "+ gEase.html_decode( "&amp;" ) );

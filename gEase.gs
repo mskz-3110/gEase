@@ -5,11 +5,7 @@ gEase.json_to_string = function( value ){
 };
 
 gEase.json_from_string = function( text, default_value ){
-  var value = default_value;
-  try{
-    value = JSON.parse( text );
-  }catch ( e ){}
-  return value;
+  return ( "" === text ) ? default_value : JSON.parse( text );
 };
 
 gEase.string_repeat = function( value, count ){
@@ -21,12 +17,7 @@ gEase.string_repeat = function( value, count ){
 };
 
 gEase.string_alignment = function( base_value, digit, pad_value ){
-  if ( 0 <= digit ){
-    return ( gEase.string_repeat( pad_value, digit ) + base_value ).slice( - digit );
-  }else{
-    digit *= -1;
-    return ( base_value + gEase.string_repeat( pad_value, digit ) ).slice( 0, digit );
-  }
+  return ( gEase.string_repeat( pad_value, digit ) + base_value ).slice( - digit );
 };
 
 gEase.html_encode = function( value ){
@@ -47,24 +38,19 @@ gEase.html_decode = function( value ){
     .replace( /&gt;/, ">" );
 };
 
-gEase.each = function( values, callback, data ){
-  if ( Array.isArray( values ) ){
-    var values_size = values.length;
-    for ( var i = 0; i < values_size; ++i ){
-      if ( false === callback( values[ i ], data ) ) break;
-    }
-  }else{
-    for ( var key in values ){
-      if ( false === callback( values[ key ], data ) ) break;
-    }
-  }
+gEase.sheet_get = function( sheet_name ){
+  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  return spreadsheet.getSheetByName( sheet_name );
 };
 
-gEase.sheet = function( sheet_name ){
+gEase.sheet_add = function( sheet_name ){
   var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = spreadsheet.getSheetByName( sheet_name );
-  if ( null == sheet ) sheet = spreadsheet.insertSheet( sheet_name, spreadsheet.getNumSheets() + 1 );
-  return sheet;
+  return spreadsheet.insertSheet( sheet_name, spreadsheet.getNumSheets() + 1 );
+};
+
+gEase.sheet_get_or_add = function( sheet_name ){
+  var sheet = gEase.sheet_get( sheet_name );
+  return ( null !== sheet ) ? sheet : gEase.sheet_add( sheet_name );
 };
 
 gEase.Sheet = function( sheet ){
@@ -79,39 +65,36 @@ gEase.Sheet = function( sheet ){
     return range;
   };
   
-  this.AddRecord = function( record, col ){
-    if ( undefined === col ) col = 1;
+  this.AddRecord = function( col, record ){
     return this.SetRecord( this.m_Sheet.getLastRow() + 1, col, record );
   };
   
-  this.SetWidth = function( width, col ){
-    if ( undefined === col ) col = 1;
+  this.SetWidth = function( col, width ){
     this.m_Sheet.setColumnWidth( col, width );
   };
   
-  this.SetWidths = function( widths, col ){
-    if ( undefined === col ) col = 1;
-    gEase.each( widths, function( width, self ){
-      self.SetWidth( width, col++ );
-    }, this);
+  this.SetWidths = function( col, widths ){
+    var self = this;
+    widths.forEach( width => {
+      self.SetWidth( col++, width );
+    });
   };
   
-  this.SetHeight = function( height, row ){
-    if ( undefined === row ) row = 1;
+  this.SetHeight = function( row, height ){
     this.m_Sheet.setRowHeight( row, height );
   };
   
-  this.SetHeights = function( heights, row ){
-    if ( undefined === row ) row = 1;
-    gEase.each( heights, function( height, self ){
-      self.SetHeight( height, row++ );
-    }, this);
+  this.SetHeights = function( row, heights ){
+    var self = this;
+    heights.forEach( height => {
+      self.SetHeight( row++, height );
+    });
   };
   
-  this.SetFilter = function( start_row_index, start_col_index, end_row_index, end_col_index ){
+  this.SetFilter = function( start_row_index, end_row_index, start_col_index, end_col_index ){
     if ( undefined === start_row_index ) start_row_index = 0;
-    if ( undefined === start_col_index ) start_col_index = 0;
     if ( undefined === end_row_index ) end_row_index = this.m_Sheet.getLastRow();
+    if ( undefined === start_col_index ) start_col_index = 0;
     if ( undefined === end_col_index ) end_col_index = this.m_Sheet.getLastColumn();
     var requests = [{
       "setBasicFilter" : {
@@ -135,12 +118,10 @@ gEase.Sheet = function( sheet ){
 };
 
 gEase.Log = function( sheet_name ){
-  this.m_Sheet = gEase.sheet( sheet_name );
-  this.GetSheet = function(){
-    return this.m_Sheet;
-  };
+  this.m_Sheet = gEase.sheet_get_or_add( sheet_name );
   
   this.Write = function( msg ){
+    if ( null === msg ) msg = "(null)";
     var row = this.m_Sheet.getLastRow() + 1;
     var col = 1;
     var cell = this.m_Sheet.getRange( row, col );
@@ -179,10 +160,10 @@ gEase.Log = function( sheet_name ){
 gEase.Regex = function( regex ){
   this.m_Regex = regex;
   
-  this.Match = function( value, callback, data ){
+  this.Match = function( value, callback ){
     var array;
-    while ( null != ( array = this.m_Regex.exec( value ) ) ){
-      if ( false === callback( array, data ) ) break;
+    while ( null !== ( array = this.m_Regex.exec( value ) ) ){
+      if ( false === callback( array ) ) break;
     }
   };
 };
